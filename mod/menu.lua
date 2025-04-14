@@ -13,3 +13,6 @@ local GITHUB_LOAD_MENU = "functions/load.lua"
 local SCRIPTS_FOLDER_URL = "https://api.github.com/repos/" .. GITHUB_USER .. "/" .. GITHUB_REPO .. "/contents/script"
 local SCRIPTS_LOAD_URL = "https://api.github.com/repos/" .. GITHUB_USER .. "/" .. GITHUB_REPO .. "/contents/" .. GITHUB_LOAD_MENU
 local SCRIPTS_MOD_URL = "https://api.github.com/repos/" .. GITHUB_USER .. "/" .. GITHUB_REPO .. "/contents/" .. GITHUB_MOD_MENU
+
+-- URL raw direta do arquivo menu.lua
+local RAW_MOD_URL = "https://raw.githubusercontent.com/" .. GITHUB_USER .. "/" .. GITHUB_REPO .. "/main/" .. GITHUB_MOD_MENU
