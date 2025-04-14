@@ -1,4 +1,4 @@
--- Verificar se já existe um ScreenGui com o nome "ModMenu"
+-- Verificar se já existe um ScreenGui com o nome FindFirstChild("Seu menu.name")
 local existingScreenGui = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Mod_Explorer")
 if existingScreenGui then return end
 
