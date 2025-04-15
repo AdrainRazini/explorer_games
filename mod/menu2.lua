@@ -106,7 +106,7 @@ local function initializeModMenu()
     local menuGui = createModExplorerGui()
 
     -- ✅ Alerta de confirmação
-    showAlertInMenu(menuGui, "Ghost ativado com sucesso!", 3)
+    showAlertInMenu(menuGui, "Menu ativado com sucesso!", 3)
 
     -- 🔽 Aqui você pode carregar o menu completo se quiser
     -- loadstring(game:HttpGet(scripts.urls.modRaw))()
