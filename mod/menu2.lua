@@ -22,7 +22,7 @@ local function loadScriptsFromGitHub()
     -- Montando as URLs usando a função
     local SCRIPTS_FOLDER_URL = buildGitHubUrl(GITHUB_USER, GITHUB_REPO, "script")
     local SCRIPTS_LOAD_URL = buildGitHubUrl(GITHUB_USER, GITHUB_REPO, "functions/load.lua")
-    local SCRIPTS_MOD_URL = buildGitHubUrl(GITHUB_USER, GITHUB_REPO, "mod/menu2.lua")
+    local SCRIPTS_MOD_URL = buildGitHubUrl(GITHUB_USER, GITHUB_REPO, "mod/menu.lua")
     local RAW_MOD_URL = buildRawGitHubUrl(GITHUB_USER, GITHUB_REPO, "mod/menu.lua")
     
     -- Aqui você pode adicionar mais lógicas para processar ou carregar os scripts
