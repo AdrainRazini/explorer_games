@@ -1,3 +1,12 @@
+
+
+--[[ Explorer Games | menu2.lua
+     Criado por Adrian75556435
+     Objetivo: Substituir o Mastermods com qualidade superior
+     Meta: ~2000 linhas organizadas e funcionais
+--]]
+
+
 -- 🧠 Função para verificar se o ScreenGui já existe
 local function getExistingModMenu()
     return game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Mod_Explorer")
@@ -77,7 +86,7 @@ local function initializeModMenu()
     end
 
     local scripts = loadScriptsFromGitHub()
-    
+
     local menuGui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("Mod_Explorer")
     showAlertInMenu(menuGui, "Ghost ativado com sucesso!", 3)
     
