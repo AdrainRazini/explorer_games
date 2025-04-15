@@ -1,54 +1,90 @@
--- Função para verificar se o ScreenGui já existe
-local function checkIfScreenGuiExists()
-    local existingScreenGui = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Mod_Explorer")
-    return existingScreenGui
+-- 🧠 Função para verificar se o ScreenGui já existe
+local function getExistingModMenu()
+    return game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Mod_Explorer")
 end
 
--- Função para montar a URL base do GitHub
+-- 🔧 Função para montar a URL base da API do GitHub
 local function buildGitHubUrl(user, repo, filePath)
     return "https://api.github.com/repos/" .. user .. "/" .. repo .. "/contents/" .. filePath
 end
 
--- Função para montar a URL raw do arquivo
+-- 📂 Função para montar a URL RAW (direta) do GitHub
 local function buildRawGitHubUrl(user, repo, filePath)
     return "https://raw.githubusercontent.com/" .. user .. "/" .. repo .. "/main/" .. filePath
 end
 
--- Função para carregar o menu de scripts do GitHub
+-- 📦 Função para carregar os caminhos dos scripts do GitHub
 local function loadScriptsFromGitHub()
     local GITHUB_USER = "AdrainRazini"
     local GITHUB_REPO = "explorer_games"
 
-    -- Montando as URLs usando a função
-    local SCRIPTS_FOLDER_URL = buildGitHubUrl(GITHUB_USER, GITHUB_REPO, "script")
-    local SCRIPTS_LOAD_URL = buildGitHubUrl(GITHUB_USER, GITHUB_REPO, "functions/load.lua")
-    local SCRIPTS_MOD_URL = buildGitHubUrl(GITHUB_USER, GITHUB_REPO, "mod/menu.lua")
-    local RAW_MOD_URL = buildRawGitHubUrl(GITHUB_USER, GITHUB_REPO, "mod/menu.lua")
-    
-    -- Aqui você pode adicionar mais lógicas para processar ou carregar os scripts
     return {
-        scriptsFolderUrl = SCRIPTS_FOLDER_URL,
-        loadScriptUrl = SCRIPTS_LOAD_URL,
-        modScriptUrl = SCRIPTS_MOD_URL,
-        rawModScriptUrl = RAW_MOD_URL
+        githubUser = GITHUB_USER,
+        githubRepo = GITHUB_REPO,
+        urls = {
+            scriptsFolder = buildGitHubUrl(GITHUB_USER, GITHUB_REPO, "script"),
+            loadScript = buildGitHubUrl(GITHUB_USER, GITHUB_REPO, "functions/load.lua"),
+            modScript = buildGitHubUrl(GITHUB_USER, GITHUB_REPO, "mod/menu.lua"),
+            modRaw = buildRawGitHubUrl(GITHUB_USER, GITHUB_REPO, "mod/menu.lua")
+        }
     }
 end
 
--- Função principal de inicialização do Mod Menu
+-- 🔔 Alerta dentro do GUI principal (Mod_Explorer)
+local function showAlertInMenu(menuGui, text, duration)
+    if not menuGui then return end
+
+    local alertFrame = Instance.new("Frame")
+    alertFrame.Size = UDim2.new(0, 280, 0, 50)
+    alertFrame.Position = UDim2.new(0.5, -140, 1, -60)
+    alertFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    alertFrame.BackgroundTransparency = 0.15
+    alertFrame.BorderSizePixel = 0
+    alertFrame.AnchorPoint = Vector2.new(0.5, 1)
+    alertFrame.Name = "LocalAlert"
+    alertFrame.ZIndex = 999
+    alertFrame.Parent = menuGui
+
+    local corner = Instance.new("UICorner", alertFrame)
+    corner.CornerRadius = UDim.new(0, 8)
+
+    local label = Instance.new("TextLabel", alertFrame)
+    label.Size = UDim2.new(1, -20, 1, -10)
+    label.Position = UDim2.new(0, 10, 0, 5)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.Gotham
+    label.TextSize = 17
+    label.TextWrapped = true
+    label.ZIndex = 1000
+
+    -- Fade e destruição depois de um tempo
+    task.delay(duration or 3, function()
+        for i = 1, 10 do
+            alertFrame.BackgroundTransparency += 0.05
+            label.TextTransparency += 0.05
+            task.wait(0.04)
+        end
+        alertFrame:Destroy()
+    end)
+end
+-- 🚀 Função principal de inicialização do Mod Menu
 local function initializeModMenu()
-    -- Verificar se o ScreenGui já existe
-    if checkIfScreenGuiExists() then
-        print("Menu já carregado!")
+    if getExistingModMenu() then
+        showAlert("Mod Menu já carregado!", 3)
         return
     end
 
-    -- Carregar os URLs de scripts
     local scripts = loadScriptsFromGitHub()
+    
+    local menuGui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("Mod_Explorer")
+    showAlertInMenu(menuGui, "Ghost ativado com sucesso!", 3)
+    
 
-    -- Aqui você pode fazer algo com os scripts, como carregar o menu
-    print("Carregando Mod Menu...")
-    -- Você pode usar as URLs de scripts aqui, como scripts.scriptsFolderUrl, scripts.loadScriptUrl, etc.
+    -- Aqui você pode carregar e executar o menu a partir da URL, ex:
+    -- loadstring(game:HttpGet(scripts.urls.modRaw))()
 end
 
--- Chama a função para inicializar o Mod Menu
+-- 🟢 Iniciar
 initializeModMenu()
