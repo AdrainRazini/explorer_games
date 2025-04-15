@@ -1,15 +1,28 @@
-
-
 --[[ Explorer Games | menu2.lua
      Criado por Adrian75556435
      Objetivo: Substituir o Mastermods com qualidade superior
      Meta: ~2000 linhas organizadas e funcionais
 --]]
 
-
 -- 🧠 Função para verificar se o ScreenGui já existe
 local function getExistingModMenu()
     return game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Mod_Explorer")
+end
+
+-- 🧱 Função para criar o Mod_Explorer se ele não existir
+local function createModExplorerGui()
+    local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    local existing = playerGui:FindFirstChild("Mod_Explorer")
+    if existing then return existing end
+
+    local modGui = Instance.new("ScreenGui")
+    modGui.Name = "Mod_Explorer"
+    modGui.ResetOnSpawn = false
+    modGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    modGui.IgnoreGuiInset = false
+    modGui.Parent = playerGui
+
+    return modGui
 end
 
 -- 🔧 Função para montar a URL base da API do GitHub
@@ -78,20 +91,24 @@ local function showAlertInMenu(menuGui, text, duration)
         alertFrame:Destroy()
     end)
 end
+
 -- 🚀 Função principal de inicialização do Mod Menu
 local function initializeModMenu()
-    if getExistingModMenu() then
-        showAlert("Mod Menu já carregado!", 3)
+    local existingGui = getExistingModMenu()
+    if existingGui then
+        showAlertInMenu(existingGui, "Mod Menu já carregado!", 3)
         return
     end
 
     local scripts = loadScriptsFromGitHub()
 
-    local menuGui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("Mod_Explorer")
-    showAlertInMenu(menuGui, "Ghost ativado com sucesso!", 3)
-    
+    -- 🔧 Criar o Mod_Explorer se ainda não existir
+    local menuGui = createModExplorerGui()
 
-    -- Aqui você pode carregar e executar o menu a partir da URL, ex:
+    -- ✅ Alerta de confirmação
+    showAlertInMenu(menuGui, "Ghost ativado com sucesso!", 3)
+
+    -- 🔽 Aqui você pode carregar o menu completo se quiser
     -- loadstring(game:HttpGet(scripts.urls.modRaw))()
 end
 
