@@ -101,14 +101,75 @@ local function initializeModMenu()
     end
 
     local scripts = loadScriptsFromGitHub()
-
-    -- 🔧 Criar o Mod_Explorer se ainda não existir
     local menuGui = createModExplorerGui()
 
-    -- ✅ Alerta de confirmação
     showAlertInMenu(menuGui, "Menu ativado com sucesso!", 3)
 
-    -- 🔽 Aqui você pode carregar o menu completo se quiser
+    -- 🎛️ Criação do menu visual
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Name = "MainMenu"
+    mainFrame.Size = UDim2.new(0, 400, 0, 300)
+    mainFrame.Position = UDim2.new(0.5, -200, 0.4, -150)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    mainFrame.Active = true
+    mainFrame.Draggable = true
+    mainFrame.Parent = menuGui
+
+    local corner = Instance.new("UICorner", mainFrame)
+    corner.CornerRadius = UDim.new(0, 8)
+
+    -- 🔻 Botão de Minimizar
+    local minimizeBtn = Instance.new("TextButton")
+    minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+    minimizeBtn.Position = UDim2.new(1, -35, 0, 5)
+    minimizeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    minimizeBtn.Text = "-"
+    minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minimizeBtn.Font = Enum.Font.GothamBold
+    minimizeBtn.TextSize = 18
+    minimizeBtn.Parent = mainFrame
+
+    local corner2 = Instance.new("UICorner", minimizeBtn)
+    corner2.CornerRadius = UDim.new(0, 6)
+
+    -- 🧾 Título
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -40, 0, 30)
+    title.Position = UDim2.new(0, 10, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = "Explorer Games Menu"
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 18
+    title.TextColor3 = Color3.new(1, 1, 1)
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = mainFrame
+
+    -- 🌀 ScrollFrame para conteúdo interno
+    local scroll = Instance.new("ScrollingFrame")
+    scroll.Size = UDim2.new(1, -20, 1, -40)
+    scroll.Position = UDim2.new(0, 10, 0, 35)
+    scroll.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    scroll.BorderSizePixel = 0
+    scroll.ScrollBarThickness = 6
+    scroll.CanvasSize = UDim2.new(0, 0, 0, 600)
+    scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    scroll.Parent = mainFrame
+
+    local scrollCorner = Instance.new("UICorner", scroll)
+    scrollCorner.CornerRadius = UDim.new(0, 6)
+
+    -- 🌐 Minimizar / Restaurar
+    local minimized = false
+    minimizeBtn.MouseButton1Click:Connect(function()
+        minimized = not minimized
+        scroll.Visible = not minimized
+        title.Visible = not minimized
+        mainFrame.Size = minimized and UDim2.new(0, 400, 0, 40) or UDim2.new(0, 400, 0, 300)
+    end)
+
+    -- (🔽) Carregar menu externo opcional
     -- loadstring(game:HttpGet(scripts.urls.modRaw))()
 end
 
