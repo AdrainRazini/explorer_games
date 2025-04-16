@@ -52,20 +52,25 @@ local function loadScriptsFromGitHub()
 	}
 end
 
--- 🔔 Alerta dentro do GUI principal (Mod_Explorer)
+-- 🔔 Alerta no canto inferior direito do Mod_Explorer - Empilhamento
+local activeAlerts = {}
+
 local function showAlertInMenu(menuGui, text, duration)
 	if not menuGui then return end
 
+	-- Cria o frame do alerta
 	local alertFrame = Instance.new("Frame")
 	alertFrame.Size = UDim2.new(0, 280, 0, 50)
-	alertFrame.Position = UDim2.new(0.5, -140, 1, -60)
+	alertFrame.Position = UDim2.new(1, -300, 1, -60 - (#activeAlerts * 60)) -- canto inferior direito
 	alertFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 	alertFrame.BackgroundTransparency = 0.15
 	alertFrame.BorderSizePixel = 0
-	alertFrame.AnchorPoint = Vector2.new(0.5, 1)
+	alertFrame.AnchorPoint = Vector2.new(0, 1) -- âncora no canto inferior esquerdo do alerta
 	alertFrame.Name = "LocalAlert"
 	alertFrame.ZIndex = 999
 	alertFrame.Parent = menuGui
+
+	table.insert(activeAlerts, alertFrame)
 
 	local corner = Instance.new("UICorner", alertFrame)
 	corner.CornerRadius = UDim.new(0, 8)
@@ -88,71 +93,30 @@ local function showAlertInMenu(menuGui, text, duration)
 			label.TextTransparency += 0.05
 			task.wait(0.04)
 		end
+
 		alertFrame:Destroy()
-	end)
-end
 
--- Função para criar botões de script
-local function createScriptButton(name, rawUrl, parent)
-	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(1, 0, 0, 35)
-	button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	button.TextColor3 = Color3.new(1, 1, 1)
-	button.Font = Enum.Font.Gotham
-	button.TextSize = 16
-	button.Text = name
-	button.Parent = parent
+		-- Remove da lista e atualiza posições restantes
+		for i, alert in ipairs(activeAlerts) do
+			if alert == alertFrame then
+				table.remove(activeAlerts, i)
+				break
+			end
+		end
 
-	local corner = Instance.new("UICorner", button)
-	corner.CornerRadius = UDim.new(0, 6)
-
-	button.MouseButton1Click:Connect(function()
-		local success, response = pcall(function()
-			return game:HttpGet(rawUrl)
-		end)
-
-		if success then
-			showAlertInMenu(parent.Parent, "Executando " .. name, 2)
-			loadstring(response)()
-		else
-			showAlertInMenu(parent.Parent, "Erro ao carregar " .. name, 2)
+		for i, alert in ipairs(activeAlerts) do
+			alert:TweenPosition(
+				UDim2.new(1, -300, 1, -60 - ((i - 1) * 60)),
+				Enum.EasingDirection.Out,
+				Enum.EasingStyle.Quad,
+				0.25,
+				true
+			)
 		end
 	end)
 end
 
--- Função para popular os botões de script
-local function populateScriptButtons(scrollFrame, githubData)
-	-- Tente carregar a lista de arquivos da pasta "script" do repositório
-	local success, response = pcall(function()
-		return game:HttpGet(githubData.urls.scriptsFolder)
-	end)
 
-	-- Se a requisição falhar, exiba um erro
-	if not success then
-		showAlertInMenu(scrollFrame.Parent, "Erro ao carregar scripts: " .. response, 3)
-		return
-	end
-
-	-- Verifique se a resposta é válida (JSON decodificado)
-	local fileList
-	local successDecode, decodedData = pcall(function()
-		fileList = HttpService:JSONDecode(response)
-	end)
-
-	-- Se não conseguiu decodificar, avise o usuário
-	if not successDecode then
-		showAlertInMenu(scrollFrame.Parent, "Erro ao decodificar arquivos JSON", 3)
-		return
-	end
-
-	-- Itere pela lista de arquivos e crie os botões para arquivos .lua
-	for _, file in pairs(fileList) do
-		if file.name:match("%.lua$") then
-			local rawUrl = buildRawGitHubUrl(githubData.githubUser, githubData.githubRepo, "script/" .. file.name)
-			createScriptButton(file.name, rawUrl, scrollFrame)
-		end
-	end
-end
 
 -- 🚀 Função principal de inicialização do Mod Menu
 local function initializeModMenu()
@@ -231,9 +195,13 @@ local function initializeModMenu()
 		mainFrame.Size = minimized and UDim2.new(0, 400, 0, 40) or UDim2.new(0, 400, 0, 300)
 	end)
 
-	-- Popular os botões de script
-	populateScriptButtons(scroll, scripts)
+	-- (🔽) Carregar menu externo opcional
+	-- loadstring(game:HttpGet(scripts.urls.modRaw))()
+	local player = game.Players.LocalPlayer
+	showAlertInMenu(menuGui, "Bem Vindo " ..player.Name  , 10)
+	
 end
 
 -- 🟢 Iniciar
 initializeModMenu()
+
