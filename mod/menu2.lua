@@ -2,7 +2,20 @@
      Criado por Adrian75556435
      Objetivo: Substituir o Mastermods com qualidade superior
      Meta: ~2000 linhas organizadas e funcionais
+
+
+
+-- [FUNCOES]
+-- -> Todas as funções primeiro (createModExplorerGui, loadScripts, Dev_Mod, etc)
+
+-- [EXECUCAO]
+-- -> initializeModMenu()
+-- -> Dev_Mod()
+
+
 --]]
+
+
 
 -- 🧠 Função para verificar se o ScreenGui já existe
 local function getExistingModMenu()
@@ -169,8 +182,7 @@ minimizeBtn.MouseButton1Click:Connect(function()
     mainFrame.Size = minimized and UDim2.new(0, 400, 0, 40) or UDim2.new(0, 400, 0, 300)
 end)
 
--- 🔽 Gerar botões a partir da pasta script
-populateScriptButtons(scroll, scripts)
+
 
 -- (🔽) Carregar menu externo opcional
 -- loadstring(game:HttpGet(scripts.urls.modRaw))()
@@ -228,5 +240,96 @@ end
 
 
 
--- 🟢 Iniciar
-initializeModMenu()
+
+
+function Dev_Mod(Owner, Id)
+    Owner = Owner or "Adrian75556435"
+    Id = Id or 1393562880
+
+    local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    local menuGui = playerGui:FindFirstChild("Mod_Explorer")
+    if not menuGui then return end
+
+    local debugFrame = Instance.new("Frame")
+    debugFrame.Size = UDim2.new(0, 350, 0, 200)
+    debugFrame.Position = UDim2.new(0.5, -175, 0.5, -100)
+    debugFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    debugFrame.BorderSizePixel = 0
+    debugFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    debugFrame.Name = "DebugPanel"
+    debugFrame.ZIndex = 1000
+    debugFrame.Parent = menuGui
+
+    local corner = Instance.new("UICorner", debugFrame)
+    corner.CornerRadius = UDim.new(0, 8)
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 30)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = "Painel Dev - Explorer Games"
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 18
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.Parent = debugFrame
+
+    local info = Instance.new("TextLabel")
+    info.Size = UDim2.new(1, -20, 1, -40)
+    info.Position = UDim2.new(0, 10, 0, 35)
+    info.BackgroundTransparency = 1
+    info.TextWrapped = true
+    info.TextYAlignment = Enum.TextYAlignment.Top
+    info.Font = Enum.Font.Gotham
+    info.TextSize = 14
+    info.TextColor3 = Color3.fromRGB(200, 200, 200)
+    info.Text = "Status do Menu:\n"
+    info.Text ..= "- Dono: " .. Owner .. "\n"
+    info.Text ..= "- ID: " .. Id .. "\n"
+
+    -- Verifica se o menu está minimizado
+    local mainMenu = menuGui:FindFirstChild("MainMenu")
+    if mainMenu then
+        if mainMenu.Size.Y.Offset <= 50 then
+            info.Text ..= "- Menu está minimizado ✅\n"
+        else
+            info.Text ..= "- Menu está visível ✅\n"
+        end
+    else
+        info.Text ..= "- Menu principal não encontrado ⚠️\n"
+    end
+
+    -- Checa se há scripts carregados ou algo mais que queira exibir
+    -- info.Text ..= "- Scripts carregados: X\n"
+
+    info.Parent = debugFrame
+
+    -- Botão para fechar o painel
+    local closeBtn = Instance.new("TextButton")
+    closeBtn.Size = UDim2.new(0, 25, 0, 25)
+    closeBtn.Position = UDim2.new(1, -30, 0, 5)
+    closeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    closeBtn.Text = "X"
+    closeBtn.TextColor3 = Color3.new(1, 1, 1)
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.TextSize = 14
+    closeBtn.ZIndex = 1001
+    closeBtn.Parent = debugFrame
+
+    local closeCorner = Instance.new("UICorner", closeBtn)
+    closeCorner.CornerRadius = UDim.new(0, 6)
+
+    closeBtn.MouseButton1Click:Connect(function()
+        debugFrame:Destroy()
+    end)
+end
+-- 🟢 Iniciar e pegar scroll/scripts
+local scroll, scripts = initializeModMenu()
+
+-- 🔽 Gerar botões a partir da pasta script
+if scroll and scripts then
+    populateScriptButtons(scroll, scripts)
+end
+
+-- 🧪 Abrir painel de desenvolvedor
+local LocalPlayer = game.Players.LocalPlayer
+Dev_Mod(LocalPlayer.Name, LocalPlayer.UserId)
