@@ -92,6 +92,68 @@ local function showAlertInMenu(menuGui, text, duration)
 	end)
 end
 
+-- Função para criar botões de script
+local function createScriptButton(name, rawUrl, parent)
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(1, 0, 0, 35)
+	button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.Font = Enum.Font.Gotham
+	button.TextSize = 16
+	button.Text = name
+	button.Parent = parent
+
+	local corner = Instance.new("UICorner", button)
+	corner.CornerRadius = UDim.new(0, 6)
+
+	button.MouseButton1Click:Connect(function()
+		local success, response = pcall(function()
+			return game:HttpGet(rawUrl)
+		end)
+
+		if success then
+			showAlertInMenu(parent.Parent, "Executando " .. name, 2)
+			loadstring(response)()
+		else
+			showAlertInMenu(parent.Parent, "Erro ao carregar " .. name, 2)
+		end
+	end)
+end
+
+-- Função para popular os botões de script
+local function populateScriptButtons(scrollFrame, githubData)
+	-- Tente carregar a lista de arquivos da pasta "script" do repositório
+	local success, response = pcall(function()
+		return game:HttpGet(githubData.urls.scriptsFolder)
+	end)
+
+	-- Se a requisição falhar, exiba um erro
+	if not success then
+		showAlertInMenu(scrollFrame.Parent, "Erro ao carregar scripts: " .. response, 3)
+		return
+	end
+
+	-- Verifique se a resposta é válida (JSON decodificado)
+	local fileList
+	local successDecode, decodedData = pcall(function()
+		fileList = HttpService:JSONDecode(response)
+	end)
+
+	-- Se não conseguiu decodificar, avise o usuário
+	if not successDecode then
+		showAlertInMenu(scrollFrame.Parent, "Erro ao decodificar arquivos JSON", 3)
+		return
+	end
+
+	-- Itere pela lista de arquivos e crie os botões para arquivos .lua
+	for _, file in pairs(fileList) do
+		if file.name:match("%.lua$") then
+			local rawUrl = buildRawGitHubUrl(githubData.githubUser, githubData.githubRepo, "script/" .. file.name)
+			createScriptButton(file.name, rawUrl, scrollFrame)
+		end
+	end
+end
+
 -- 🚀 Função principal de inicialização do Mod Menu
 local function initializeModMenu()
 	local existingGui = getExistingModMenu()
@@ -169,8 +231,8 @@ local function initializeModMenu()
 		mainFrame.Size = minimized and UDim2.new(0, 400, 0, 40) or UDim2.new(0, 400, 0, 300)
 	end)
 
-	-- (🔽) Carregar menu externo opcional
-	-- loadstring(game:HttpGet(scripts.urls.modRaw))()
+	-- Popular os botões de script
+	populateScriptButtons(scroll, scripts)
 end
 
 -- 🟢 Iniciar
